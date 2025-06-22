@@ -1,13 +1,8 @@
-import Navbar from "@/components/Navbar"
-
 
 const HomePage = () => {
   return (
     <>
-      {/* Navbar */}
-      <Navbar />
-
-      <div className="home">
+      <div className="flex my-20">
         <h1> Welcome to Home Page</h1>
       </div>
     </>

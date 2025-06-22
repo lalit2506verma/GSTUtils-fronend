@@ -54,8 +54,9 @@ const Navbar = () => {
 
     const navigate = useNavigate();
 
-    const handleClick = () => {
-        navigate('/register');
+    // function to navigate to different pages
+    const handleClick = (path : string) => {
+        navigate(path);
     }
 
     return (
@@ -69,7 +70,7 @@ const Navbar = () => {
 
                     <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
 
-                        <button onClick={handleClick} type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        <button onClick={() => handleClick("/auth/register")} type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                             Get started
                         </button>
 
@@ -80,7 +81,7 @@ const Navbar = () => {
                             </span>
 
                             <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15" />
+                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 1h15M1 7h15M1 13h15" />
                             </svg>
 
                         </button>
@@ -92,7 +93,7 @@ const Navbar = () => {
                             <NavigationMenuList>
                                 {/* Home */}
                                 <NavigationMenuItem>
-                                    <Button variant="ghost">Home</Button>
+                                    <Button onClick={() => handleClick("/home")} variant="ghost">Home</Button>
                                 </NavigationMenuItem>
 
                                 {/* Services */}
@@ -158,14 +159,14 @@ const Navbar = () => {
                                 {/* About */}
                                 <NavigationMenuItem>
                                     <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                                        <Link to={''}> About </Link>
+                                        <Link to={'/about'}> About </Link>
                                     </NavigationMenuLink>
                                 </NavigationMenuItem>
                                 
                                 {/* Contacts */}
                                 <NavigationMenuItem>
                                     <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                                        <Link to={''}> Contacts</Link>
+                                        <Link to={'/contact'}> Contacts</Link>
                                     </NavigationMenuLink>
                                 </NavigationMenuItem>
 
