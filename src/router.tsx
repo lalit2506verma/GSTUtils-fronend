@@ -6,6 +6,8 @@ import HomePageLayout from "./layouts/HomePageLayout";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import AuthLayout from "./layouts/AuthLayout";
+import UserDashboard from "./pages/UserDashboard";
+import ProtectedRoute from "./layouts/ProtectedRoute";
 
 export const router = createBrowserRouter([
     {
@@ -26,6 +28,17 @@ export const router = createBrowserRouter([
                 path: 'contact',
                 element: <ContactPage />
             },
+
+            {
+                path: 'user',
+                element: <ProtectedRoute />,
+                children: [
+                    {
+                        path: 'dashboard',
+                        element: <UserDashboard />
+                    },
+                ]
+            }
 
         ]
     },
