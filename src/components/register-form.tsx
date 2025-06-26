@@ -5,11 +5,39 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import login_form_illustrator from "@/assets/login_form_illustrator.png"
 import { Link } from "react-router-dom"
+import { useState } from "react"
+
+interface RegisterFormProps {
+  className?: string
+  onSubmit: (tempUser: {email: string, password: string, username:string}) => void
+}
+
 
 export function RegisterForm({
   className,
+  onSubmit,
   ...props
-}: React.ComponentProps<"div">) {
+}: RegisterFormProps) {
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+
+  // handle submit of registration form
+  const handleRegisterSubmit = (e : React.FormEvent) => {
+    e.preventDefault();
+
+    // checking password and confirm password 
+    if(password.trim() === confirmPassword.trim()){
+      // extracting the username form the email
+      var username = email.substring(0, email.indexOf('@'))
+      onSubmit({email, password, username})
+    }
+    else{
+      alert("Password not matching")
+      return;
+    }
+  }
   return (
     <div className={cn("flex flex-col gap-6 ", className)} {...props}>
       <Card className="overflow-hidden p-0 h-full">
@@ -23,7 +51,7 @@ export function RegisterForm({
             />
           </div>
 
-          <form className="p-6 md:p-8">
+          <form className="p-6 md:p-8" onSubmit={handleRegisterSubmit}>
             <div className="flex flex-col gap-6">
 
               <div className="flex flex-col items-center text-center">
@@ -39,6 +67,8 @@ export function RegisterForm({
                   id="email"
                   type="email"
                   placeholder="m@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value.toLowerCase())}
                   required
                 />
               </div>
@@ -47,14 +77,26 @@ export function RegisterForm({
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                 </div>
-                <Input id="password" type="password" required />
+                <Input 
+                  id="password" 
+                  type="password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required 
+                />
               </div>
 
               <div className="grid gap-3">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Confirm Password</Label>
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
                 </div>
-                <Input id="password" type="password" required />
+                <Input 
+                  id="confirmPassword" 
+                  type="password" 
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required 
+                />
               </div>
 
               <Button type="submit" className="w-full">

@@ -6,11 +6,28 @@ export interface LoginCredentials {
   password: string
 }
 
-export const login = (credentials: LoginCredentials) => {
+export interface TempUser {
+  email: string
+  password: string
+  username: string
+}
 
-    console.log("sending data to backend");
-    console.log(credentials.username);
-    console.log(credentials.password);
+export const login = async(credentials: LoginCredentials) => {
+
+  console.log("sending data to backend");
+  console.log(credentials.username);
+  console.log(credentials.password);
     
-    return myAxios.post('/login', credentials).then((response) => response.data)
+  return await myAxios.post('/login', credentials).then((response) => response.data)
+}
+
+export const register = async (user: TempUser) : Promise<any> => {
+  console.log("sending data to backend");
+  console.log(user.email);
+  console.log(user.password);
+  console.log(user.username);
+
+  const response = await myAxios.post("/user/", user)
+  return response.data
+
 }

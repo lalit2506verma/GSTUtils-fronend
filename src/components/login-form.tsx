@@ -63,8 +63,8 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input 
-                  id="password" 
+                <Input
+                  id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -118,7 +118,7 @@ export function LoginForm({
 
           <div className="bg-muted hidden md:flex items-center justify-center relative h-full w-full">
             <img
-              src= {login_form_illustrator}
+              src={login_form_illustrator}
               alt="Image"
               className="max-w-full max-h-full object-contain dark:brightness-[0.2] dark:grayscale"
             />
