@@ -1,4 +1,5 @@
 import { LoginForm } from '@/components/login-form'
+import { useAuth } from '@/services/auth-context'
 import { login, type LoginCredentials } from '@/services/authenticateService'
 import { useState } from "react"
 import { useNavigate } from 'react-router-dom'
@@ -8,6 +9,7 @@ const LoginPage = () => {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const {setIsLoggedIn} = useAuth()
 
 
   const  handleLogin = async (credentials: LoginCredentials) => {
@@ -35,9 +37,10 @@ const LoginPage = () => {
         console.log("Success Login");
 
         // storing in local storage
-        localStorage.setItem("token", resp)
+        localStorage.setItem("authToken", resp)
 
         // navigate to dashboard
+        setIsLoggedIn(true)
         navigate("/user/dashboard")
 
       }).catch((error) => {

@@ -12,6 +12,8 @@ export interface TempUser {
   username: string
 }
 
+
+// login API
 export const login = async(credentials: LoginCredentials) => {
 
   console.log("sending data to backend");
