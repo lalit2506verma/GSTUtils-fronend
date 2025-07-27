@@ -1,4 +1,3 @@
-import axios from "axios";
 import { myAxios } from "./helper";
 
 // 1. Define the shape of the credentials you send

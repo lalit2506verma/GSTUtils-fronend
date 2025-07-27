@@ -1,77 +1,93 @@
-import { LoginForm } from '@/components/login-form'
-import { useAuth } from '@/services/auth-context'
-import { login, type LoginCredentials } from '@/services/authenticateService'
-import { useState } from "react"
-import { useNavigate } from 'react-router-dom'
+import { LoginForm } from "@/components/login-form";
+import { useAuth } from "@/services/auth-context";
+import { login, type LoginCredentials } from "@/services/authenticateService";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const LoginPage = () => {
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const { login: loginUser } = useAuth();
 
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
-  const {login: loginUser} = useAuth()
+    const handleLogin = async (credentials: LoginCredentials) => {
+        setError("");
 
+        //data validation
+        if (credentials.username.trim() === "") {
+            alert("Enter a valid Name");
+        }
 
-  const  handleLogin = async (credentials: LoginCredentials) => {
-    setLoading(true)
-    setError("")
+        if (credentials.password.trim() === "") {
+            alert("Enter a strong password");
+        }
 
-    try {
-      //data validation
-      if(credentials.username.trim() === ""){
-        alert("Enter a valid Name")
-      }
+        console.log(credentials.username);
+        console.log(credentials.password);
 
-      if(credentials.password.trim() === ""){
-        alert("Enter a strong password")
-      }
+        setLoading(true);
 
-      console.log(credentials.username);
-      console.log(credentials.password);
+        try {
+            const username = credentials.username;
 
-      const username = credentials.username;
-    
-      // calling server API for sending data
+            const loginPromise = login(credentials);
 
-      login(credentials).then((token: string) =>{
-        // success
-        console.log(token);
-        console.log("Success Login");
+            const token = await toast.promise(loginPromise, {
+                pending: "Logging In....",
+                success: "Login Successful!",
+                error: {
+                    render({ data }) {
+                        const err = data as any;
+                        const message = err?.response?.data?.message || err?.message || "Invalid Credentials or Server error";
+                        return <>{message}</>;
+                    },
+                },
+            });
 
-        // // storing in local storage
-        // localStorage.setItem("authToken", token) -> Handle in Auth-Context file
+            loginUser(token, username);
+            navigate("/user/dashboard");
+            // // calling server API for sending data
+            // login(credentials).then((token: string) =>{
+            //   // success
+            //   console.log(token);
+            //   console.log("Success Login");
 
-        // navigate to dashboard
-        loginUser(token, username);
-        navigate("/user/dashboard")
+            //   // // storing in local storage
+            //   // localStorage.setItem("authToken", token) -> Handle in Auth-Context file
 
-      }).catch((error) => {
-        console.log(error);
-        console.log("Error Log");
-      });
+            //   // navigate to dashboard
+            //   loginUser(token, username);
+            //   navigate("/user/dashboard")
 
-    } catch (err: any) {
+            // }).catch((error) => {
+            //   console.log(error);
+            //   console.log("Error Log");
+            // });
+        } catch (err: any) {
+            console.log(err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
 
-      setError(err.message)
+        // throw new Error('Function not implemented.')
+    };
 
-    } finally {
+    return (
+        <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
+            <div className="w-full max-w-sm md:max-w-3xl">
+                <LoginForm onSubmit={handleLogin} />
 
-      setLoading(false)
-    }
+                {error && <p className="text-red-500 mt-4 text-sm">{error}</p>}
+                {loading && (
+                    <p className="text-muted-foreground text-sm">
+                        Logging in...
+                    </p>
+                )}
+            </div>
+        </div>
+    );
+};
 
-    // throw new Error('Function not implemented.')
-  }
-
-  return (
-    <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm md:max-w-3xl">
-        <LoginForm onSubmit={handleLogin}/>
-
-        {error && <p className="text-red-500 mt-4 text-sm">{error}</p>}
-        {loading && <p className="text-muted-foreground text-sm">Logging in...</p>}
-      </div>
-    </div>
-  )
-}
-
-export default LoginPage
+export default LoginPage;

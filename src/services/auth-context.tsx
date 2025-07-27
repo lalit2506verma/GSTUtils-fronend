@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState} from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { validateToken } from "./authenticateService";
 
@@ -11,10 +11,10 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider = ({children}: {children: ReactNode}) => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false); 
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [user, setUser] = useState<string | null>(null); // Track Current-user (principal)
-    
+
     const login = (token: string, username?: string) => {
         localStorage.setItem("authToken", token);
         if (username) {
@@ -39,28 +39,30 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
             validateToken(token)
                 .then((response) => {
                     // valide token
-                    const username = localStorage.getItem("username") || response.username;
+                    const username =
+                        localStorage.getItem("username") || response.username;
                     setIsLoggedIn(true);
                     setUser(username); // Restore username if present
                 })
                 .catch((error) => {
                     // Invalid token
+                    console.log(error);
                     console.warn("Invalid Token");
                     logout();
-                })
-        } 
+                });
+        }
     }, []);
 
     return (
-        <AuthContext.Provider value={{isLoggedIn, login, logout, user}} >
+        <AuthContext.Provider value={{ isLoggedIn, login, logout, user }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
 export const useAuth = () => {
-    const context = useContext(AuthContext)
-    if(!context) throw new Error("useAuth must be used within AuthProvider")
-    
+    const context = useContext(AuthContext);
+    if (!context) throw new Error("useAuth must be used within AuthProvider");
+
     return context;
 };
