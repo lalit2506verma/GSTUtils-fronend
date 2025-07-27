@@ -1,9 +1,10 @@
 import { createContext, useContext, useEffect, useState} from "react";
 import type { ReactNode } from "react";
+import { validateToken } from "./authenticateService";
 
 interface AuthContextType {
     isLoggedIn: boolean;
-    login: (token: string) => void;
+    login: (token: string, username?: string) => void;
     logout: () => void;
     user: string | null;
 }
@@ -12,7 +13,7 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({children}: {children: ReactNode}) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false); 
-    const [user, setUser] = useState<string | null>(null);
+    const [user, setUser] = useState<string | null>(null); // Track Current-user (principal)
     
     const login = (token: string, username?: string) => {
         localStorage.setItem("authToken", token);
@@ -34,14 +35,20 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     // validate token on mount
     useEffect(() => {
         const token = localStorage.getItem("authToken");
-        const savedUser = localStorage.getItem("username");
         if (token) {
-            setIsLoggedIn(true);
-            setUser(savedUser); // Restore username if present
-        } else {
-            setIsLoggedIn(false);
-            setUser(null);
-        }
+            validateToken(token)
+                .then((response) => {
+                    // valide token
+                    const username = localStorage.getItem("username") || response.username;
+                    setIsLoggedIn(true);
+                    setUser(username); // Restore username if present
+                })
+                .catch((error) => {
+                    // Invalid token
+                    console.warn("Invalid Token");
+                    logout();
+                })
+        } 
     }, []);
 
     return (

@@ -1,3 +1,4 @@
+import axios from "axios";
 import { myAxios } from "./helper";
 
 // 1. Define the shape of the credentials you send
@@ -33,3 +34,23 @@ export const register = async (user: TempUser) : Promise<any> => {
   return response.data
 
 }
+
+export const validateToken = async (token: string): Promise<{username: string}> => {
+  try{
+    const response = await myAxios.post(
+      "/api/auth/validate", // endpoint
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return response.data;
+  }
+  catch(error) {
+    throw new Error("Token validation failed")
+  }
+};

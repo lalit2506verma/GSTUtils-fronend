@@ -9,7 +9,7 @@ const LoginPage = () => {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
-  const {setIsLoggedIn} = useAuth()
+  const {login: loginUser} = useAuth()
 
 
   const  handleLogin = async (credentials: LoginCredentials) => {
@@ -28,19 +28,21 @@ const LoginPage = () => {
 
       console.log(credentials.username);
       console.log(credentials.password);
+
+      const username = credentials.username;
     
       // calling server API for sending data
 
-      login(credentials).then((resp: string) =>{
+      login(credentials).then((token: string) =>{
         // success
-        console.log(resp);
+        console.log(token);
         console.log("Success Login");
 
-        // storing in local storage
-        localStorage.setItem("authToken", resp)
+        // // storing in local storage
+        // localStorage.setItem("authToken", token) -> Handle in Auth-Context file
 
         // navigate to dashboard
-        setIsLoggedIn(true)
+        loginUser(token, username);
         navigate("/user/dashboard")
 
       }).catch((error) => {
