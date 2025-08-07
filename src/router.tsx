@@ -8,54 +8,65 @@ import ContactPage from "./pages/ContactPage";
 import AuthLayout from "./layouts/AuthLayout";
 import UserDashboard from "./pages/UserDashboard";
 import ProtectedRoute from "./layouts/ProtectedRoute";
+import Calculators from "./pages/Calculators";
+import HRA from "./pages/Hra";
 
 export const router = createBrowserRouter([
     {
-        path: '/',
+        path: "/",
         element: <HomePageLayout />,
         children: [
             {
-                path: 'home',
-                element: <HomePage />
+                path: "home",
+                element: <HomePage />,
             },
 
             {
-                path: 'about',
-                element: <AboutPage />
+                path: "about",
+                element: <AboutPage />,
             },
 
             {
-                path: 'contact',
-                element: <ContactPage />
+                path: "contact",
+                element: <ContactPage />,
             },
 
             {
-                path: 'user',
+                path: "resources/calculators",
+                element: <Calculators />,
+            },
+
+            {
+                path: "resources/calculators/hra",
+                element: <HRA />
+            },
+
+            {
+                path: "user",
                 element: <ProtectedRoute />,
                 children: [
                     {
-                        path: 'dashboard',
-                        element: <UserDashboard />
+                        path: "dashboard",
+                        element: <UserDashboard />,
                     },
-                ]
-            }
-
-        ]
+                ],
+            },
+        ],
     },
 
     {
-        path: '/auth',
+        path: "/auth",
         element: <AuthLayout />,
         children: [
             {
-                path: 'login',
+                path: "login",
                 element: <LoginPage />,
             },
 
             {
-                path: 'register',
+                path: "register",
                 element: <RegisterPage />,
             },
-        ]
+        ],
     },
 ]);

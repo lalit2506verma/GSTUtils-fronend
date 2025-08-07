@@ -1,3 +1,5 @@
+import { AppSidebar } from '@/components/app-sidebar';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Navigate, Outlet } from 'react-router-dom'
 
 const ProtectedRoute = () => {
@@ -8,7 +10,17 @@ const ProtectedRoute = () => {
         return <Navigate to="/auth/login" replace />
     }
     
-  return <Outlet />
+  return (
+      <>
+          <SidebarProvider>
+              <AppSidebar />
+              <main>
+                  <SidebarTrigger />
+                  <Outlet />
+              </main>
+          </SidebarProvider>
+      </>
+  );
 }
 
 export default ProtectedRoute
