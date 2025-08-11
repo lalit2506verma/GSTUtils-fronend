@@ -3,7 +3,7 @@ import React from 'react'
 const UserDashboard = () => {
   return (
     <>
-      <div className="flex my-20">
+      <div className="flex mt-24 mx-5">
         <h1> Welcome to User Dashboard Page</h1>
       </div>
     </>

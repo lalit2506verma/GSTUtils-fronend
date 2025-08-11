@@ -10,6 +10,9 @@ import UserDashboard from "./pages/UserDashboard";
 import ProtectedRoute from "./layouts/ProtectedRoute";
 import Calculators from "./pages/Calculators";
 import HRA from "./pages/Hra";
+import GST_Tools from "./pages/GST_Tools";
+import GST_Profile from "./pages/GST_Profile";
+import GST_Import from "./pages/GST_Import";
 
 export const router = createBrowserRouter([
     {
@@ -38,7 +41,7 @@ export const router = createBrowserRouter([
 
             {
                 path: "resources/calculators/hra",
-                element: <HRA />
+                element: <HRA />,
             },
 
             {
@@ -46,8 +49,34 @@ export const router = createBrowserRouter([
                 element: <ProtectedRoute />,
                 children: [
                     {
+                        index: true,
+                        element: <UserDashboard/>
+                    },
+
+                    {
                         path: "dashboard",
                         element: <UserDashboard />,
+                    },
+
+                    {
+                        path: "dashboard/gst-tool",
+                        element: <GST_Tools />,
+                        children: [
+                            {
+                                index: true,
+                                element: <GST_Profile/>
+                            },
+
+                            {
+                                path: "gst-profile",
+                                element: <GST_Profile/>
+                            },
+
+                            {
+                                path: "gst-import",
+                                element: <GST_Import/>
+                            }
+                        ]
                     },
                 ],
             },

@@ -40,3 +40,10 @@
 .read-the-docs {
   color: #888;
 }
+
+@media (min-width: 768px) {
+  main {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+  }
+}
