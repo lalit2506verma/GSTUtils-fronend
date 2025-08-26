@@ -130,7 +130,9 @@ export default function GST_Profile() {
                                 placeholder="GST Number"
                                 className="w-full p-2 outline-none"
                                 value={gstin}
-                                onChange={e => setGstin(e.target.value.toUpperCase())}
+                                onChange={(e) =>
+                                    setGstin(e.target.value.toUpperCase())
+                                }
                                 maxLength={15}
                                 required
                             />
@@ -178,12 +180,14 @@ export default function GST_Profile() {
                             <select
                                 className="w-full p-2 outline-none"
                                 value={month}
-                                onChange={e => setMonth(e.target.value)}
+                                onChange={(e) => setMonth(e.target.value)}
                                 required
                             >
                                 <option value="">Month</option>
-                                {months.map(m => (
-                                    <option key={m} value={m}>{m}</option>
+                                {months.map((m) => (
+                                    <option key={m} value={m}>
+                                        {m}
+                                    </option>
                                 ))}
                             </select>
                         </div>
@@ -207,7 +211,7 @@ export default function GST_Profile() {
                             <select
                                 className="w-full p-2 outline-none"
                                 value={year}
-                                onChange={e => setYear(e.target.value)}
+                                onChange={(e) => setYear(e.target.value)}
                                 required
                             >
                                 <option value="">2025 (Return Year)</option>
@@ -243,20 +247,38 @@ export default function GST_Profile() {
                                 </span>
                             </p>
                             <p className="text-sm text-gray-500">
-                                <span className="font-medium">State:</span> {selectedGstin.state}{" "}
-                                /<span className="font-medium"> Period:</span>{" "}
+                                <span className="font-medium">State:</span>{" "}
+                                {selectedGstin.state} /
+                                <span className="font-medium"> Period:</span>{" "}
                                 {months.indexOf(selectedGstin.month) + 1 < 10
-                                    ? `0${months.indexOf(selectedGstin.month) + 1}`
-                                    : months.indexOf(selectedGstin.month) + 1
-                                }
+                                    ? `0${
+                                          months.indexOf(selectedGstin.month) +
+                                          1
+                                      }`
+                                    : months.indexOf(selectedGstin.month) + 1}
                                 -{selectedGstin.year}
                             </p>
                         </div>
                         <button
                             className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 mt-3 md:mt-0"
-                            onClick={() => navigate("gst-import")}
+                            onClick={() =>
+                                navigate(
+                                    "/user/dashboard/gst-tool/gst-import",
+                                    { state: { selectedGstin } }
+                                )
+                            }
                         >
-                            <svg className="inline-block mr-2" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 5v14m7-7H5"></path></svg>
+                            <svg
+                                className="inline-block mr-2"
+                                width="18"
+                                height="18"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
+                            >
+                                <path d="M12 5v14m7-7H5"></path>
+                            </svg>
                             Import Data
                         </button>
                     </div>
@@ -287,21 +309,34 @@ export default function GST_Profile() {
             {/* GSTIN List */}
             <div className="bg-white rounded-xl shadow-md p-6 w-full max-w-3xl mt-8">
                 <h3 className="text-xl font-semibold mb-2 text-center">
-                    GSTIN List <span className="text-gray-400 text-sm">( Added:{gstinList.length} / Limit:20 )</span>
+                    GSTIN List{" "}
+                    <span className="text-gray-400 text-sm">
+                        ( Added:{gstinList.length} / Limit:20 )
+                    </span>
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {gstinList.map((info) => (
                         <div
                             key={info.gstin}
-                            className={`border rounded-lg p-4 flex flex-col items-center ${selectedGstin?.gstin === info.gstin ? "border-blue-500 bg-blue-50" : "bg-gray-50"}`}
+                            className={`border rounded-lg p-4 flex flex-col items-center ${
+                                selectedGstin?.gstin === info.gstin
+                                    ? "border-blue-500 bg-blue-50"
+                                    : "bg-gray-50"
+                            }`}
                         >
                             <p className="font-semibold">{info.gstin}</p>
                             <p className="text-xs text-gray-500 mb-2">
-                                <span className="font-medium">Added:</span> {info.added}{" "}
-                                / <span className="font-medium">Used:</span> {info.used}
+                                <span className="font-medium">Added:</span>{" "}
+                                {info.added} /{" "}
+                                <span className="font-medium">Used:</span>{" "}
+                                {info.used}
                             </p>
                             <button
-                                className={`px-4 py-1 rounded text-white text-sm ${selectedGstin?.gstin === info.gstin ? "bg-blue-500" : "bg-blue-400 hover:bg-blue-500"}`}
+                                className={`px-4 py-1 rounded text-white text-sm ${
+                                    selectedGstin?.gstin === info.gstin
+                                        ? "bg-blue-500"
+                                        : "bg-blue-400 hover:bg-blue-500"
+                                }`}
                                 onClick={() => handleSelect(info)}
                             >
                                 Select

@@ -19,6 +19,7 @@ import snapDeal_logo from "@/assets/snapdeal.png";
 import glowroad_logo from "@/assets/glowroad.png";
 import limeroad_logo from "@/assets/limeroad.png";
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 
 function CustomFileInput({
     label,
@@ -68,6 +69,10 @@ type Platform = {
 };
 
 export default function GST_Import() {
+    // Selected GSTIN information
+    const location = useLocation();
+    const selectedGstin = location.state?.selectedGstin;
+
     // State: { [platformName]: { [fileLabel]: File | null } }
     const [platformFiles, setPlatformFiles] = useState<{
         [platform: string]: { [fileLabel: string]: File | null };
@@ -249,7 +254,7 @@ export default function GST_Import() {
                                                 id="return-month"
                                                 className="grid gap-3 border rounded py-1.5 text-center shadow-xl"
                                             >
-                                                July Data
+                                                {selectedGstin.month} Data
                                             </div>
 
                                             {/* Download Path */}
@@ -271,7 +276,7 @@ export default function GST_Import() {
                                                 <span className="font-semibold">
                                                     Upload Files:{" "}
                                                     <span className="text-red-500">
-                                                        (July-2025)
+                                                        ({selectedGstin.month}-2025)
                                                     </span>
                                                 </span>
                                                 {platform.files.map(
