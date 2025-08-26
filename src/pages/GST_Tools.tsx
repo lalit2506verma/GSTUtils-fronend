@@ -1,3 +1,4 @@
+import DynamicBreadcrumb from '@/components/DynamicBreadcrumb';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Outlet } from 'react-router-dom';
 
@@ -13,26 +14,7 @@ export default function GST_Tools() {
                   </span>
 
                   {/* Breadcrumb */}
-                  <Breadcrumb>
-                      <BreadcrumbList>
-                          <BreadcrumbItem>Home</BreadcrumbItem>
-                          <BreadcrumbSeparator />
-                          <BreadcrumbItem>
-                              <BreadcrumbLink href="/user/dashboard">
-                                  Dashboard
-                              </BreadcrumbLink>
-                          </BreadcrumbItem>
-                          <BreadcrumbSeparator />
-                          <BreadcrumbItem>
-                              <BreadcrumbLink
-                                  href="/user/dashboard/gst-tool"
-                                  className="font-semibold"
-                              >
-                                  GST Online Seller
-                              </BreadcrumbLink>
-                          </BreadcrumbItem>
-                      </BreadcrumbList>
-                  </Breadcrumb>
+                  <DynamicBreadcrumb />
               </div>
 
               {/* Body */}
