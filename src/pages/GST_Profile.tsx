@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import { fetchGstinList } from "@/services/GstinService";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { months, states } from "@/data/states";
 
 type GstinInfo = {
     gstin: string;
@@ -9,17 +11,6 @@ type GstinInfo = {
     state: string;
     added: string;
     used: string;
-};
-
-const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-];
-
-const states: { [key: string]: string } = {
-    "09": "Uttar Pradesh",
-    "05": "Uttarakhand",
-    // Add more state codes as needed
 };
 
 function getStateFromGstin(gstin: string) {
@@ -33,41 +24,69 @@ function getCurrentDate() {
 }
 
 export default function GST_Profile() {
+    // Get userID from local storage
+    const token = localStorage.getItem("authToken");
     const navigate = useNavigate();
     const [gstin, setGstin] = useState("");
-    const [frequency, setFrequency] = useState<"Monthly" | "Quarterly">("Monthly");
+    const [frequency, setFrequency] = useState<"Monthly" | "Quarterly">(
+        "Monthly"
+    );
     const [month, setMonth] = useState("");
     const [year, setYear] = useState("2025");
-    const [gstinList, setGstinList] = useState<GstinInfo[]>([
-        {
-            gstin: "09IPOPS6247J2ZT",
-            frequency: "Monthly",
-            month: "July",
-            year: "2025",
-            state: "Uttar Pradesh",
-            added: "14-08-2024",
-            used: "25-08-2025"
-        },
-        {
-            gstin: "05BCUPV5986R1ZZ",
-            frequency: "Monthly",
-            month: "June",
-            year: "2025",
-            state: "Uttarakhand",
-            added: "10-08-2025",
-            used: "11-08-2025"
-        },
-        {
-            gstin: "09BGIPV0399E2ZW",
-            frequency: "Quarterly",
-            month: "August",
-            year: "2025",
-            state: "Uttar Pradesh",
-            added: "03-08-2025",
-            used: "10-08-2025"
-        }
-    ]);
+    const [gstinList, setGstinList] = useState<GstinInfo[]>([]);
     const [selectedGstin, setSelectedGstin] = useState<GstinInfo | null>(null);
+
+    // Fetch existing GSTINs from database
+    useEffect(() => {
+        if (!token) {
+            console.log("User not logged in");
+            return;
+        }
+
+        const fetchData = async () => {
+            try {
+                const data = await fetchGstinList(token);
+                console.log("Raw API Response:", data);
+
+                // Map backend response to GstinInfo type
+                const mapped: GstinInfo[] = data.map((item: any) => {
+                    let month = "";
+                    let year = "";
+
+                    if (item.lastUsedReturnPeriod) {
+                        const [m, y] = item.lastUsedReturnPeriod.split("/");
+                        month = m.padStart(2, "0"); // Ensure two-digit month
+                        year = y;
+                    }
+
+                    return {
+                        gstin: item.gstinNumber,
+                        frequency: "Monthly", // Default value, adjust if needed
+                        state: item.state,
+                        month,
+                        year,
+                        added: item.createdAt
+                            ? new Date(item.createdAt).toLocaleDateString(
+                                  "en-GB"
+                              )
+                            : "",
+                        used: item.updatedAt
+                            ? new Date(item.updatedAt).toLocaleDateString(
+                                  "en-GB"
+                              )
+                            : "",
+                    };
+                });
+
+                setGstinList(mapped);
+                console.log("Mapped GSTINs:", mapped);
+            } catch (err) {
+                console.error("Error fetching GSTINs:", err);
+            }
+        };
+
+        fetchData();
+    }, [token]);
 
     // Handle form submit
     const handleSubmit = (e: React.FormEvent) => {
@@ -81,18 +100,35 @@ export default function GST_Profile() {
             year,
             state,
             added: getCurrentDate(),
-            used: getCurrentDate()
+            used: getCurrentDate(),
         };
         setGstinList((prev) => [newGstin, ...prev]);
         setSelectedGstin(newGstin);
-        setGstin("");
-        setMonth("");
-        setYear("2025");
     };
 
     // Handle select from GSTIN list
     const handleSelect = (info: GstinInfo) => {
         setSelectedGstin(info);
+
+        // two way binding for all the fields
+        setGstin(info.gstin);
+        setFrequency(info.frequency);
+        setMonth(info.month);
+        setYear(info.year);
+    };
+
+    // Handle import submit
+    const handleImportSubmit = () => {
+        if (!selectedGstin) {
+            console.error("No GSTIN selected for import");
+            return;
+        }
+        console.log("Importing data for:", selectedGstin);
+        
+
+        navigate("/user/dashboard/gst-tool/gst-import", {
+            state: { selectedGstin },
+        });
     };
 
     return (
@@ -184,9 +220,9 @@ export default function GST_Profile() {
                                 required
                             >
                                 <option value="">Month</option>
-                                {months.map((m) => (
-                                    <option key={m} value={m}>
-                                        {m}
+                                {Object.entries(months).map(([Key, value]) => (
+                                    <option key={Key} value={Key}>
+                                        {value}
                                     </option>
                                 ))}
                             </select>
@@ -250,23 +286,12 @@ export default function GST_Profile() {
                                 <span className="font-medium">State:</span>{" "}
                                 {selectedGstin.state} /
                                 <span className="font-medium"> Period:</span>{" "}
-                                {months.indexOf(selectedGstin.month) + 1 < 10
-                                    ? `0${
-                                          months.indexOf(selectedGstin.month) +
-                                          1
-                                      }`
-                                    : months.indexOf(selectedGstin.month) + 1}
-                                -{selectedGstin.year}
+                                {selectedGstin.month}-{selectedGstin.year}
                             </p>
                         </div>
                         <button
                             className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 mt-3 md:mt-0"
-                            onClick={() =>
-                                navigate(
-                                    "/user/dashboard/gst-tool/gst-import",
-                                    { state: { selectedGstin } }
-                                )
-                            }
+                            onClick={() => handleImportSubmit()}
                         >
                             <svg
                                 className="inline-block mr-2"
