@@ -3,9 +3,9 @@ import { ChevronLeftIcon } from "lucide-react";
 
 export default function hra() {
     return (
-        <>
-            <div className="flex justify-center my-20">
-                <div className="w-[60%] border-gray-200 h-8">
+        <div className="min-h-screen flex flex-col pt-24 pb-16 bg-gray-50">
+            <div className="flex justify-center flex-1">
+                <div className="w-full max-w-3xl border-gray-200">
                     {/* Back button */}
                     <div className="back-button my-1">
                         <Button variant="ghost" onClick={() => history.back()}>
@@ -173,6 +173,6 @@ export default function hra() {
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 }
