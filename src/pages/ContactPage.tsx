@@ -3,44 +3,7 @@ import ContactImage from "../assets/contact-us.jpg";
 
 const ContactPage = () => {
     return (
-        <div className="relative flex h-auto min-h-screen w-full flex-col bg-[#f8fcfc] overflow-x-hidden font-inter">
-            {/* Header */}
-            <header className="flex items-center justify-between border-b border-[#e6f4f4] px-10 py-3">
-                <div className="flex items-center gap-4 text-[#0c1c1d]">
-                    <div className="size-6">
-                        <svg
-                            viewBox="0 0 48 48"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="text-[#0c1c1d]"
-                        >
-                            <path
-                                d="M6 6H42L36 24L42 42H6L12 24L6 6Z"
-                                fill="currentColor"
-                            />
-                        </svg>
-                    </div>
-                    <h2 className="text-lg font-bold">Stofin</h2>
-                </div>
-                <div className="flex flex-1 justify-end gap-8">
-                    <nav className="flex items-center gap-9">
-                        {["Home", "Services", "About Us", "Contact Us"].map(
-                            (item) => (
-                                <a
-                                    key={item}
-                                    href="#"
-                                    className="text-sm font-medium text-[#0c1c1d] hover:text-[#00b8c2] transition"
-                                >
-                                    {item}
-                                </a>
-                            )
-                        )}
-                    </nav>
-                    <button className="flex items-center justify-center rounded-lg bg-[#00b8c2] px-4 h-10 text-sm font-bold text-[#0c1c1d]">
-                        Get Started
-                    </button>
-                </div>
-            </header>
+        <div className="relative flex h-auto min-h-screen w-full flex-col bg-[#f8fcfc] overflow-x-hidden font-inter pt-20">
 
             {/* Contact Section */}
             <div className="flex flex-1 items-center justify-center px-6 md:px-40 py-10">
