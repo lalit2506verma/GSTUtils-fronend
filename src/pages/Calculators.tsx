@@ -10,6 +10,7 @@ import {
     Wallet,
     LineChart,
 } from "lucide-react";
+import { GiReceiveMoney } from 'react-icons/gi';
 import { useNavigate } from "react-router-dom";
 
 const calculators = [
@@ -28,6 +29,7 @@ const calculators = [
         icon: <LineChart size={28} />,
         path: "mutual-fund",
     },
+    { title: "SIP", icon: <GiReceiveMoney size={28} />, path: "sip" },
 ];
 
 function Calculators() {

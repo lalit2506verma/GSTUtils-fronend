@@ -13,6 +13,7 @@ import HRA from "./pages/Hra";
 import GST_Tools from "./pages/GST_Tools";
 import GST_Profile from "./pages/GST_Profile";
 import GST_Import from "./pages/GST_Import";
+import SIP_Page from "./pages/SIP_Page";
 
 export const router = createBrowserRouter([
     {
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
             {
                 path: "resources/calculators/hra",
                 element: <HRA />,
+            },
+            {
+                path: "resources/calculators/sip",
+                element: <SIP_Page />,
             },
 
             {

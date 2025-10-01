@@ -62,7 +62,7 @@ export default function hra() {
                     <div className="container my-6">
                         <div className="header">
                             <span>
-                                <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight text-balance">
+                                <h1 className="scroll-m-20 text-4xl font-extrabold tracking- text-balance">
                                     HRA Calculator
                                 </h1>
                             </span>
@@ -88,7 +88,7 @@ export default function hra() {
                                 The exemption is calculated as the lowest of the
                                 following:
                             </p>
-                            <ul className="list-disc list-inside pl-4 mb-3">
+                            <ul className="list-disc list-outside pl-4 mb-3">
                                 <li>
                                     <strong className="text-sm">
                                         Actual HRA received
