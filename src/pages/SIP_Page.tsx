@@ -14,10 +14,9 @@ import { ChevronLeftIcon } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 
 type Frequency = "Monthly" | "Quarterly" | "Yearly" | "Weekly" | "15-days";
+type Mode = "SIP" | "Lumpsum";
 
 function SIP_Page() {
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
   const [sipAmount, setSipAmount] = useState<number>(10000);
   const [duration, setDuration] = useState<number>(10); // In years
   const [returnRate, setReturnRate] = useState<number>(10.0);
@@ -25,6 +24,8 @@ function SIP_Page() {
   const [investedAmount, setInvestedAmount] = useState<number>(0);
   const [estimatedReturn, setEstimatedReturn] = useState<number>(0);
   const [totalValue, setTotalValue] = useState<number>(0);
+
+  const [tab, setTab] = useState<Mode>("SIP");
 
   // CONVERT NUMBER IN INDIAN FORMAT STYLE
   const formatINR = (value: number) => {
@@ -71,35 +72,35 @@ function SIP_Page() {
 
   // CALCULATE TOTAL INVESTED AMOUNT BASED ON FREQUENCY
   useEffect(() => {
-    let monthlyInvestment = calculateMonthlyInvestedAmount(
-      frequency,
-      sipAmount
-    );
-    setInvestedAmount(monthlyInvestment * duration * 12);
-  }, [sipAmount, duration, frequency]);
-
-  // CALCULATE INVESTED, TOTAL, RETURNS TOGETHER
-  useEffect(() => {
-    const p = calculateMonthlyInvestedAmount(frequency, sipAmount);
-    const r = returnRate / 100 / 12; // monthly return rate
-    const n = duration * 12; // total months
-
+    const r = returnRate / 100 / 12; // monthly rate
+    const n = duration * 12; // months
+    let invested = 0;
     let total = 0;
 
-    if (r > 0) {
-      // Future Value formula for SIP
-      total = p * (((Math.pow(1 + r, n) - 1) * (1 + r)) / r);
-    } else {
-      total = p * n;
+    if (tab === "SIP") {
+      const p = calculateMonthlyInvestedAmount(frequency, sipAmount);
+
+      if (r > 0) {
+        total = p * (((Math.pow(1 + r, n) - 1) * (1 + r)) / r);
+      } else {
+        total = p * n;
+      }
+
+      invested = p * n;
+    } else if (tab === "Lumpsum") {
+      invested = sipAmount;
+
+      if (r > 0) {
+        total = invested * Math.pow(1 + r, n);
+      } else {
+        total = invested;
+      }
     }
 
-    const invested = p * n;
-    const returns = total - invested;
-
     setInvestedAmount(invested);
-    setEstimatedReturn(returns);
+    setEstimatedReturn(total - invested);
     setTotalValue(total);
-  }, [duration, sipAmount, frequency, returnRate]);
+  }, [tab, sipAmount, duration, frequency, returnRate]);
 
   // CALCULATE PERCENTAGES
   const { investedPercent, returnsPercent } = useMemo(() => {
@@ -170,13 +171,20 @@ function SIP_Page() {
 
             <div className="border p-6 my-6 w-full rounded-md shadow-lg">
               {/* Add your content here */}
-              <Tabs defaultValue="account" className="w-full flex flex-col">
-                <TabsList className="gap-7">
-                  <TabsTrigger value="account">SIP</TabsTrigger>
-                  <TabsTrigger value="password">Lumpsum</TabsTrigger>
-                  <TabsTrigger value="GoalSIP">Goal SIP</TabsTrigger>
+              <Tabs
+                value={tab}
+                onValueChange={(val) => setTab(val as Mode)}
+                className="w-full flex flex-col"
+              >
+                <TabsList className="gap-10 border-0">
+                  {/* SIP */}
+                  <TabsTrigger value="SIP">SIP</TabsTrigger>
+
+                  {/* LumpSum */}
+                  <TabsTrigger value="Lumpsum">Lumpsum</TabsTrigger>
                 </TabsList>
-                <TabsContent className="m-4 p-6" value="account">
+
+                <TabsContent className="m-4 p-6" value="SIP">
                   <div className="flex flex-col gap-4">
                     {/* FREQUENCY INPUT */}
                     <div className="flex justify-between border w-full p-4 rounded-md items-center">
@@ -398,12 +406,205 @@ function SIP_Page() {
                     </div>
                   </div>
                 </TabsContent>
-                <TabsContent value="password">
-                  Change your password here.
+
+                <TabsContent className="m-4 p-6" value="Lumpsum">
+                  <div className="flex flex-col gap-4">
+                    {/* LumpSum AMOUNT INPUT */}
+                    <div className="flex flex-col justify-between border w-full p-4 rounded-md items-center">
+                      <div className="flex justify-between w-full items-center">
+                        <label
+                          htmlFor="lumpsum"
+                          className="font-medium text-gray-800 px-3"
+                        >
+                          Investment amount
+                        </label>
+
+                        <div className="relative w-[180px]">
+                          {/* Currency symbol */}
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 font-semibold text-lg">
+                            ₹
+                          </span>
+
+                          <Input
+                            id="lumpsum"
+                            type="text"
+                            className="w-full text-right pl-6 pr-2 text-gray-600 font-semibold md:text-lg"
+                            placeholder="0"
+                            value={sipAmount ? formatINR(sipAmount) : ""}
+                            onChange={(e) => handleInputChange(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      {/* Slider */}
+                      <div className="flex w-full pt-5 items-center">
+                        <Slider
+                          className="[&>.relative]:bg-gray-200 [&>.relative>.absolute]:bg-cyan-500"
+                          value={[sipAmount]}
+                          max={1000000}
+                          step={100}
+                          onValueChange={(val) => setSipAmount(val[0])}
+                        />
+                      </div>
+                    </div>
+
+                    {/* SIP DURATION INPUT */}
+                    <div className="flex flex-col justify-between border w-full p-4 rounded-md items-center">
+                      <div className="flex justify-between w-full items-center">
+                        <label
+                          htmlFor="duration"
+                          className="font-medium text-gray-800 px-3"
+                        >
+                          Investment duration
+                        </label>
+
+                        <div className="relative w-[180px]">
+                          <Input
+                            className="w-full text-left pr-6 pl-2 text-gray-500 font-semibold md:text-lg"
+                            type="text"
+                            placeholder="0"
+                            value={duration}
+                            onChange={(e) =>
+                              setDuration(Number(e.target.value))
+                            }
+                          />
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-lg ">
+                            year
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex w-full pt-5 items-center">
+                        <Slider
+                          className="[&>.relative]:bg-gray-200 [&>.relative>.absolute]:bg-cyan-500"
+                          value={[duration]}
+                          max={40}
+                          step={1}
+                          onValueChange={(val) => setDuration(Number(val))}
+                        />
+                      </div>
+                    </div>
+
+                    {/* RETURN RATE INPUT */}
+                    <div className="flex flex-col justify-between border w-full p-4 rounded-md items-center">
+                      <div className="flex justify-between w-full items-center">
+                        <label
+                          htmlFor="returnRate"
+                          className="font-medium text-gray-800 px-3"
+                        >
+                          Expected rate of return
+                        </label>
+
+                        <div className="relative w-[180px]">
+                          <Input
+                            id="returnRate"
+                            className="w-full text-left pr-6 pl-2 text-gray-500 font-semibold md:text-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none 
+             [&::-webkit-inner-spin-button]:appearance-none"
+                            type="number"
+                            step="any" // allows decimals like 5.25
+                            placeholder="0"
+                            value={returnRate}
+                            onChange={(e) =>
+                              setReturnRate(
+                                e.target.value === ""
+                                  ? 0
+                                  : parseFloat(e.target.value)
+                              )
+                            }
+                          />
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-lg ">
+                            %
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex w-full pt-5 items-center">
+                        <Slider
+                          className="[&>.relative]:bg-gray-200 [&>.relative>.absolute]:bg-cyan-500"
+                          value={[returnRate]}
+                          max={30}
+                          step={0.1}
+                          onValueChange={(val) => setReturnRate(Number(val))}
+                        />
+                      </div>
+                    </div>
+
+                    {/* RESULT */}
+                    <div className="border bg-gray-100 w-full p-5 rounded-md">
+                      <div className="grid grid-cols-1 gap-3 pb-3 md:grid-cols-3 md:px-2">
+                        {/* COLUMN 1 */}
+                        <div className="flex gap-4">
+                          {/* Circle Indicator*/}
+                          <div className="mt-1 h-3 w-3 shrink-0 rounded-full bg-orange-500"></div>
+
+                          {/* Value */}
+                          <div className="flex w-full justify-between md:flex-col">
+                            <div className="pb-1 text-sm text-gray-500 font-semibold ">
+                              Invested amount
+                            </div>
+                            <div className="font-medium text-lg">
+                              ₹&nbsp; {formatINR(investedAmount)}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* COLUMN 2 */}
+                        <div className="flex gap-4">
+                          {/* Circle Indicator */}
+                          <div className="mt-1 h-3 w-3 shrink-0 rounded-full bg-cyan-500"></div>
+
+                          {/* Value */}
+                          <div className="flex w-full justify-between md:flex-col">
+                            <div className="pb-1 text-sm text-gray-500 font-semibold">
+                              Estimated returns
+                            </div>
+                            <div className="font-medium text-lg">
+                              ₹&nbsp; {formatINR(totalValue - investedAmount)}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* COLUMN 3 */}
+                        <div className="flex gap-4">
+                          {/* Circle Indicator */}
+                          <div className="mt-1 h-3 w-3 shrink-0 rounded-full bg-transparent"></div>
+
+                          {/* Value */}
+                          <div className="flex w-full justify-between md:flex-col">
+                            <div className="pb-1 text-sm text-gray-500 font-semibold">
+                              Total value
+                            </div>
+                            <div className="font-medium text-lg">
+                              ₹&nbsp; {formatINR(totalValue)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Bar */}
+                      <div className="flex h-10 w-full rounded-md overflow-hidden text-white font-semibold text-center">
+                        <motion.div
+                          className="bg-orange-500 flex items-center justify-center"
+                          animate={{ width: `${investedPercent}%` }}
+                          transition={{ duration: 0.6, ease: "easeInOut" }}
+                        >
+                          {investedPercent > 10 && (
+                            <span>{investedPercent.toFixed(0)}%</span>
+                          )}
+                        </motion.div>
+                        <motion.div
+                          className="bg-cyan-500 flex items-center justify-center"
+                          animate={{ width: `${returnsPercent}%` }}
+                          transition={{ duration: 0.6, ease: "easeInOut" }}
+                        >
+                          {returnsPercent > 10 && (
+                            <span>{returnsPercent.toFixed(0)}%</span>
+                          )}
+                        </motion.div>
+                      </div>
+                    </div>
+                  </div>
                 </TabsContent>
-                <TabsContent value="GoalSIP">
-                  Set a goal for your SIP investments
-                </TabsContent>
+
               </Tabs>
             </div>
           </div>
