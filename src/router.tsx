@@ -14,6 +14,7 @@ import GST_Tools from "./pages/GST_Tools";
 import GST_Profile from "./pages/GST_Profile";
 import GST_Import from "./pages/GST_Import";
 import SIP_Page from "./pages/SIP_Page";
+import OldVsNewTaxRegimeCalculator from "./pages/OldVsNewTaxRegimeCalculator";
 
 export const router = createBrowserRouter([
     {
@@ -47,6 +48,11 @@ export const router = createBrowserRouter([
             {
                 path: "resources/calculators/sip",
                 element: <SIP_Page />,
+            },
+
+            {
+                path: "resources/calculators/old-vs-new-tax-regime",
+                element: <OldVsNewTaxRegimeCalculator/>
             },
 
             {
