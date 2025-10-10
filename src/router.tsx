@@ -15,98 +15,96 @@ import GST_Profile from "./pages/GST_Profile";
 import GST_Import from "./pages/GST_Import";
 import SIP_Page from "./pages/SIP_Page";
 import OldVsNewTaxRegimeCalculator from "./pages/OldVsNewTaxRegimeCalculator";
+import EMICalculatorPage from "./pages/EMICalculatorPage";
 
 export const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <HomePageLayout />,
+  {
+    path: "/",
+    element: <HomePageLayout />,
+    children: [
+      {
+        path: "home",
+        element: <HomePage />,
+      },
+
+      {
+        path: "about",
+        element: <AboutPage />,
+      },
+
+      {
+        path: "contact",
+        element: <ContactPage />,
+      },
+
+      {
+        path: "resources/calculators",
+        element: <Calculators />,
+      },
+
+      {
+        path: "resources/calculators/hra",
+        element: <HRA />,
+      },
+      {
+        path: "resources/calculators/sip",
+        element: <SIP_Page />,
+      },
+      {
+        path: "resources/calculators/emi",
+        element: <EMICalculatorPage />,
+      },
+      {
+        path: "user",
+        element: <ProtectedRoute />,
         children: [
-            {
-                path: "home",
-                element: <HomePage />,
-            },
+          {
+            index: true,
+            element: <UserDashboard />,
+          },
 
-            {
-                path: "about",
-                element: <AboutPage />,
-            },
+          {
+            path: "dashboard",
+            element: <UserDashboard />,
+          },
 
-            {
-                path: "contact",
-                element: <ContactPage />,
-            },
+          {
+            path: "dashboard/gst-tool",
+            element: <GST_Tools />,
+            children: [
+              {
+                index: true,
+                element: <GST_Profile />,
+              },
 
-            {
-                path: "resources/calculators",
-                element: <Calculators />,
-            },
+              {
+                path: "gst-profile",
+                element: <GST_Profile />,
+              },
 
-            {
-                path: "resources/calculators/hra",
-                element: <HRA />,
-            },
-            {
-                path: "resources/calculators/sip",
-                element: <SIP_Page />,
-            },
-
-            {
-                path: "resources/calculators/old-vs-new-tax-regime",
-                element: <OldVsNewTaxRegimeCalculator/>
-            },
-
-            {
-                path: "user",
-                element: <ProtectedRoute />,
-                children: [
-                    {
-                        index: true,
-                        element: <UserDashboard/>
-                    },
-
-                    {
-                        path: "dashboard",
-                        element: <UserDashboard />,
-                    },
-
-                    {
-                        path: "dashboard/gst-tool",
-                        element: <GST_Tools />,
-                        children: [
-                            {
-                                index: true,
-                                element: <GST_Profile/>
-                            },
-
-                            {
-                                path: "gst-profile",
-                                element: <GST_Profile/>
-                            },
-
-                            {
-                                path: "gst-import",
-                                element: <GST_Import/>
-                            }
-                        ]
-                    },
-                ],
-            },
+              {
+                path: "gst-import",
+                element: <GST_Import />,
+              },
+            ],
+          },
         ],
-    },
+      },
+    ],
+  },
 
-    {
-        path: "/auth",
-        element: <AuthLayout />,
-        children: [
-            {
-                path: "login",
-                element: <LoginPage />,
-            },
-
-            {
-                path: "register",
-                element: <RegisterPage />,
-            },
-        ],
-    },
+  {
+    path: "/auth",
+    element: <AuthLayout />,
+    children: [
+      {
+        path: "login",
+        element: <LoginPage />,
+      },
+      {
+        path: "register",
+        element: <RegisterPage />,
+      },
+    ],
+  },
 ]);
