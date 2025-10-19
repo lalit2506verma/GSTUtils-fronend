@@ -38,7 +38,7 @@ export const indianStates = [
 ] as const;
 
 export const months: {[key: string]: string} = {
-    "01": "January",
+    1: "January",
     "02": "February",
     "03": "March",
     "04": "April",

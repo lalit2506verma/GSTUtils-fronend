@@ -12,8 +12,6 @@ import {
 } from "lucide-react";
 import { GiReceiveMoney } from "react-icons/gi";
 import { useNavigate } from "react-router-dom";
-import { FaCalculator } from "react-icons/fa";
-import { BiRupee } from "react-icons/bi";
 
 const calculators = [
   {

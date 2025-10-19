@@ -4,12 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { months, states } from "@/data/states";
 import { toast } from "react-toastify";
 import type { ReceiverGstinInfo } from "@/services/GstinService";
+import { fetchAndCreateReturnIfNotExists } from "@/services/ReturnPeriodService";
 
 export type GstinInfo = {
     gstin: string;
     frequency: "Monthly" | "Quarterly";
     returnMonth: string;
-    returnYear: string;
+    returnYear: number;
     state: string;
 };
 
@@ -27,7 +28,7 @@ export default function GST_Profile() {
         "Monthly"
     );
     const [month, setMonth] = useState("");
-    const [year, setYear] = useState("2025");
+    const [year, setYear] = useState(2025);
     const [gstinList, setGstinList] = useState<ReceiverGstinInfo[]>([]);
     const [selectedGstin, setSelectedGstin] = useState<GstinInfo | null>(null);
 
@@ -81,41 +82,49 @@ export default function GST_Profile() {
 
     // Handle import submit
     const handleImportSubmit = () => {
-        // Validate selection fields are filled before navigating
-        if (!gstin || !month || !year || !frequency) {
-            toast.error("Please fill all fields before importing.");
-            return;
-        }
+      // Validate selection fields are filled before navigating
+      if (!gstin || !month || !year || !frequency) {
+        toast.error("Please fill all fields before importing.");
+        return;
+      }
 
-        if (!selectedGstin) {
-            console.error("No GSTIN selected for import");
-            return;
-        }
-        console.log("Importing data for:", selectedGstin);
+      if (!selectedGstin) {
+        console.error("No GSTIN selected for import");
+        return;
+      }
+      console.log("Importing data for:", selectedGstin);
 
-        // Before navigating,
-        // ensure if GSTIN already exists in the gstinList -> Update API call to update 'used' timestamp
-        // else -> Add API call to add new GSTIN
+      // Before navigating,
+      // ensure if GSTIN already exists in the gstinList -> Update API call to update 'used' timestamp
+      // else -> Add API call to add new GSTIN
 
-        const existingGSTIN = gstinList.find(
-            (g) => g.gstinNumber === selectedGstin.gstin
-        );
+      const existingGSTIN = gstinList.find(
+        (g) => g.gstinNumber === selectedGstin.gstin
+      );
 
-        if (existingGSTIN) {
-            // Update existing GSTIN
-            updateGstin(token!, selectedGstin.gstin)
-                .then(() => console.log("GSTIN updated successfully"))
-                .catch((err) => console.log("Error updating GSTIN:", err));
-        } else {
-            // Add new GSTIN
-            addGstin(token!, selectedGstin)
-                .then(() => console.log("GSTIN added successfully"))
-                .catch((err) => console.log("Error adding GSTIN:", err));
-        }
+      if (existingGSTIN) {
+        // Update existing GSTIN
+        updateGstin(token!, selectedGstin.gstin)
+          .then(() => console.log("GSTIN updated successfully"))
+          .catch((err) => console.log("Error updating GSTIN:", err));
+      } else {
+        // Add new GSTIN
+        addGstin(token!, selectedGstin)
+          .then(() => console.log("GSTIN added successfully"))
+          .catch((err) => console.log("Error adding GSTIN:", err));
+      }
 
-        navigate("/user/dashboard/gst-tool/gst-import", {
+      // NEW RETURN WILL BE FETCHED OR CREATED IN BACKEND WHEN USER IMPORTS DATA
+      fetchAndCreateReturnIfNotExists(token!, selectedGstin)
+        .then((data) => {
+          console.log("Return period ensured successfully:", data);
+
+          // NAVIGATION TO NEXT PAGE
+          navigate("/user/dashboard/gst-tool/gst-import", {
             state: { selectedGstin },
-        });
+          });
+        })
+        .catch((err) => console.log("Error ensuring return period:", err));
     };
 
     return (
@@ -234,7 +243,7 @@ export default function GST_Profile() {
                             <select
                                 className="w-full p-2 outline-none"
                                 value={year}
-                                onChange={(e) => setYear(e.target.value)}
+                                onChange={(e) => setYear(Number(e.target.value))}
                                 required
                             >
                                 <option value="">2025 (Return Year)</option>
