@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Platform } from "@/data/Platforms";
+import { platforms } from "@/data/Platforms";
 import {
   Dialog,
   DialogClose,
@@ -10,33 +12,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import meesho_logo from "@/assets/meesho.png";
-import amazon_logo from "@/assets/amazon.png";
-import flipkart_logo from "@/assets/flipkart.png";
-import myntra_logo from "@/assets/myntra.png";
-import jioMart_logo from "@/assets/jiomart.png";
-import snapDeal_logo from "@/assets/snapdeal.png";
-import glowroad_logo from "@/assets/glowroad.png";
-import limeroad_logo from "@/assets/limeroad.png";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { months } from "@/data/states";
-
-type PlatformFile = {
-  label: string;
-  fileType: string;
-  fileDownloadPath?: string;
-  instruction?: string;
-};
-
-type Platform = {
-  name: string;
-  type: string;
-  logo: string;
-  link: string;
-  downloadPath?: string;
-  files: PlatformFile[];
-};
+import { uploadFiles } from "@/services/PlatformService";
 
 // EXAMPLE STRUCTURE OF USESTATE
 // {
@@ -61,8 +40,9 @@ type FileEntry = {
   file: File | null;
 };
 
-type PlatformFileMap = Record<string, Record<string, FileEntry[]>>;
+export type PlatformFileMap = Record<string, Record<string, FileEntry[]>>;
 
+// ========================= COMPONENT =========================
 function CustomFileInput({
   label,
   file,
@@ -73,9 +53,6 @@ function CustomFileInput({
   setFile: (File: File | null) => void;
 }) {
   const inputId = label.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
-  console.log(label);
-  console.log(file);  
-  
   return (
     <div className="flex mb-2">
       <label
@@ -98,10 +75,16 @@ function CustomFileInput({
   );
 }
 
+
+// ========================= MAIN =========================
 export default function GST_Import() {
   // Selected GSTIN information
   const location = useLocation();
   const selectedGstin = location.state?.selectedGstin;
+  const token = localStorage.getItem("authToken");
+
+  console.log(selectedGstin);
+  
 
   // State: { [platformName]: { [fileLabel]: File | null } }
   const [platformFiles, setPlatformFiles] = useState<PlatformFileMap>({});
@@ -110,102 +93,6 @@ export default function GST_Import() {
   const monthName = (monthNumber: string) => {
     return months[monthNumber] || "Unknown Month";
   };
-
-  const platforms: Platform[] = [
-    {
-      name: "Meesho",
-      type: "B2C",
-      logo: meesho_logo,
-      link: "meesho.com",
-      downloadPath: "Meesho Panel -> Payments -> Download GST Reports",
-      files: [
-        { label: "tcs_sales.xlsx", fileType: "sales" },
-        { label: "tcs_sales_return.xlsx", fileType: "sales" },
-        {
-          label: "Tax_invoice_details.xlsx",
-          fileType: "invoice",
-          fileDownloadPath: "Meesho Panel → Payments → Tax Invoice",
-          instruction:
-            "Unzip the file and upload only the Excel (Tax_invoice_details.xlsx) file.",
-        },
-      ],
-    },
-    {
-      name: "Amazon",
-      type: "B2C",
-      logo: amazon_logo,
-      link: "amazon.in",
-      downloadPath:
-        "Reports -> Manage Taxes -> GST Monthly Reports -> Download Report -> Select Merchant Tax Report (MTR) -> select (B2C) -> Select Year and Month -> Download Report.",
-      files: [{ label: "MTR_B2C File", fileType: "sales" }],
-    },
-    {
-      name: "Amazon B2B",
-      type: "B2B",
-      logo: amazon_logo,
-      link: "amazon.in",
-      downloadPath:
-        "Reports -> Manage Taxes -> GST Monthly Reports -> Download Report -> Select Merchant Tax Report (MTR) -> select (B2B) -> Select Year and Month -> Download Report.",
-      files: [{ label: "MTR_B2C File", fileType: "sales" }],
-    },
-    {
-      name: "Flipkart",
-      type: "B2C & B2B",
-      logo: flipkart_logo,
-      link: "flipkart.com",
-      downloadPath: "Flipkart Portal -> Report -> Tax Reports -> Sales report",
-      files: [{ label: "Sales Report", fileType: "sales" }],
-    },
-    {
-      name: "Myntra",
-      type: "B2C",
-      logo: myntra_logo,
-      link: "myntra.com",
-      downloadPath:
-        "Partner Portal -> Financial Reports -> Monthly Reports -> Select Month -> Download Below Required Reports",
-      files: [
-        { label: "GSTR Report Packed", fileType: "sales" },
-        { label: "GSTR Report RTO", fileType: "sales" },
-        { label: "GSTR Report RT", fileType: "invoice" },
-      ],
-    },
-    {
-      name: "Snapdeal",
-      type: "B2C",
-      logo: snapDeal_logo,
-      link: "snapdeal.com",
-      downloadPath:
-        "Snapdeal Panel -> Payments -> GST Report -> Request Report -> Download report",
-      files: [{ label: "GSTR Return Report", fileType: "invoice" }],
-    },
-    {
-      name: "Glowroad",
-      type: "B2C",
-      logo: glowroad_logo,
-      link: "glowroad.com",
-      downloadPath:
-        "Glowroad Portal -> My Earnings -> Download ->GST Reports & Invoices -> Select Year and Month -> Download",
-      files: [{ label: "GST Reports", fileType: "sales" }],
-    },
-    {
-      name: "Limeroad",
-      type: "B2C",
-      logo: limeroad_logo,
-      link: "limeroad.com",
-      downloadPath:
-        "Limeroad Portal -> Report -> Tax Reports -> GSTR return report",
-      files: [{ label: "GSTR Report", fileType: "sales" }],
-    },
-    {
-      name: "JioMart",
-      type: "B2C",
-      logo: jioMart_logo,
-      link: "jiomart.com",
-      downloadPath:
-        "Jiomart Portal -> Reports -> View Generated Reports -> Invoice reports -> Monthly -> Download",
-      files: [{ label: "GSTR Report", fileType: "sales" }],
-    },
-  ];
 
   // ========================= FILE CHANGE HANDLER =========================
   const handleFileUploadChange = (
@@ -237,16 +124,41 @@ export default function GST_Import() {
     });
   };
 
-  // Handle platform-wise upload submission
+  // =========== SUBMIT PLATFORM-UPLOAD HANDLER ===========
   const handlePlatformSubmit = async (
     e: React.FormEvent,
     platform: Platform
   ) => {
     e.preventDefault();
     console.log("Submitting data for:", platform.name);
-    console.log("Platform files:", platformFiles[platform.name]);
+    console.log("Platform files:", platformFiles);
+
+    // VALIDATION
+    if (!platformFiles[platform.name]) {
+      return;
+    }
+
+    if (!token) {
+      console.log("User not logged in");
+      return;
+    }
+
+    console.log("API hit");
+    
+
+    // API CALL
+    await uploadFiles(token, platformFiles, platform.name, selectedGstin)
+      .then((data) => {
+        console.log("succcess from upload", data);
+        
+      })
+      .catch(error => {
+        console.log("Error while uploading the file", error);
+        
+      })
   };
 
+  // ========================= UI =========================
   return (
     <div className="p-6">
       {/* Warning text */}
@@ -288,9 +200,7 @@ export default function GST_Import() {
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[500px] sm:max-h-[700px]">
-                  <form
-                    onSubmit={(e) => handlePlatformSubmit(e, platform)}
-                  >
+                  <form onSubmit={(e) => handlePlatformSubmit(e, platform)}>
                     <DialogHeader className="bg-grey-200">
                       <DialogTitle className="text-center text-3xl">
                         {platform.name}
@@ -366,7 +276,7 @@ export default function GST_Import() {
                       </div>
                     </div>
 
-                    <div className="flex-1 border-t border-gray-300"></div>
+                    <div className="flex-1 mb-5 border-t border-gray-300"></div>
                     <DialogFooter>
                       <DialogClose asChild>
                         <Button variant="outline">Cancel</Button>
